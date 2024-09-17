@@ -1,16 +1,15 @@
-from typing import Iterable
-import scrapy
+from scrapy.spiders import CrawlSpider, Rule
+from scrapy import Request
+from scrapy.linkextractors import LinkExtractor
 from scrapy.http import Response
 from ..items import SgiherbItem
 from datetime import datetime
 
 
-class SgIherbSpider(scrapy.Spider):
+class SgIherbSpider(CrawlSpider):
     name = "sg.iherb"
     allowed_domains = ["sg.iherb.com"]
-    start_urls = [
-        "https://sg.iherb.com/pr/cococare-100-moroccan-argan-oil-2-fl-oz-60-ml/50488"
-    ]
+    start_urls = ["https://sg.iherb.com/new-products"]
     custom_settings = {
         "DOWNLOAD_HANDLERS": {
             "http": "scrapy_impersonate.ImpersonateDownloadHandler",
@@ -18,13 +17,26 @@ class SgIherbSpider(scrapy.Spider):
         },
         "TWISTED_REACTOR": "twisted.internet.asyncioreactor.AsyncioSelectorReactor",
     }
+    rules = [
+        Rule(
+            LinkExtractor(allow=(r"/pr/")),
+            follow=True,
+            callback="parse",
+            process_request="enable_impersonate",
+        )
+    ]
 
     def start_requests(self):
-        yield scrapy.Request(
-            "https://sg.iherb.com/pr/cococare-100-moroccan-argan-oil-2-fl-oz-60-ml/50488",
-            dont_filter=True,
-            meta={"impersonate": "chrome110"},
-        )
+        for url in self.start_urls:
+            yield Request(
+                url,
+                dont_filter=True,
+                meta={"impersonate": "chrome110"},
+            )
+
+    def enable_impersonate(self, request, response):
+        request.meta["impersonate"] = "chrome110"
+        return request
 
     def parse(self, response: Response):
         title = response.css("h1#name ::text").get()
