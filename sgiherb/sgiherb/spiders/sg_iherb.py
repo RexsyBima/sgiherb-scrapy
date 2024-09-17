@@ -8,7 +8,7 @@ import random
 
 
 class SgIherbSpider(CrawlSpider):
-    browser_names = ["chrome124", "chrome123", "chrome120"]
+    browser_names = ["chrome124", "chrome123", "chrome120", "chrome110"]
     name = "sg.iherb"
     allowed_domains = ["sg.iherb.com"]
     start_urls = ["https://sg.iherb.com/new-products"]
@@ -38,7 +38,7 @@ class SgIherbSpider(CrawlSpider):
             )
 
     def enable_impersonate(self, request, response):
-        request.meta["impersonate"] = self.get_impersonate_cffi()
+        request.meta["impersonate"] = "chrome110"
         return request
 
     def parse(self, response: Response):

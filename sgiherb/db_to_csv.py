@@ -1,8 +1,11 @@
 import pandas as pd
-from db_to_csv.utils import get_current_date
-
-from db_to_csv import session
 from db_to_csv.models import SgiherbSqlAlchemyItem, SgiherbItem
+from db_to_csv import session
+from datetime import datetime
+
+
+def get_current_date():
+    return datetime.now().strftime("%Y-%m-%d")
 
 
 if __name__ == "__main__":
@@ -12,6 +15,6 @@ if __name__ == "__main__":
     for i in all_data:
         del i["_sa_instance_state"]
         del i["id"]
-    items = [SgiherbItem(**i) for i in all_data]
+    items = [SgiherbItemDataclass(**i) for i in all_data]
     df = pd.DataFrame(items)
     df.to_csv(f"sgiherb-{get_current_date()}.csv", index=False)

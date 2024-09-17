@@ -19,9 +19,7 @@ class SgiherbPipeline:
         item["product_overview"] = self.parsing_product_overview(
             self.parsing_whitespaces_to_list(item["product_overview"])
         )
-        item["manufacturer"] = self.parsing_whitespaces_to_string(item["manufacturer"])[
-            0
-        ]
+        item["manufacturer"] = self.parsing_whitespaces_to_string(item["manufacturer"])
         item["rating"] = float(item["rating"])
         item["total_rating"] = int(item["total_rating"].replace(",", ""))
         item["in_stock"] = self.check_stock(item["in_stock"])

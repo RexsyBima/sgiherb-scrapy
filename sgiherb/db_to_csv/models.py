@@ -23,7 +23,7 @@ class SgiherbSqlAlchemyItem(Base):
 
 
 @dataclass
-class SgiherbItem(Base):
+class SgiherbItem:
     title: str
     price: float
     product_description: str
