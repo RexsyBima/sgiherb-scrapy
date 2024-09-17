@@ -1,16 +1,17 @@
-from typing import Iterable
+from scrapy.spiders import CrawlSpider, Rule
+from scrapy.linkextractors import LinkExtractor
 import scrapy
 from scrapy.http import Response
 from ..items import SgiherbItem
 from datetime import datetime
+import random
 
 
-class SgIherbSpider(scrapy.Spider):
+class SgIherbSpider(CrawlSpider):
+    browser_names = ["chrome124", "chrome123", "chrome120"]
     name = "sg.iherb"
     allowed_domains = ["sg.iherb.com"]
-    start_urls = [
-        "https://sg.iherb.com/pr/cococare-100-moroccan-argan-oil-2-fl-oz-60-ml/50488"
-    ]
+    start_urls = ["https://sg.iherb.com/new-products"]
     custom_settings = {
         "DOWNLOAD_HANDLERS": {
             "http": "scrapy_impersonate.ImpersonateDownloadHandler",
@@ -18,13 +19,27 @@ class SgIherbSpider(scrapy.Spider):
         },
         "TWISTED_REACTOR": "twisted.internet.asyncioreactor.AsyncioSelectorReactor",
     }
+    rules = [
+        Rule(link_extractor=LinkExtractor(allow=r"p="), follow=True),
+        Rule(
+            link_extractor=LinkExtractor(allow=r"/pr/"),
+            callback="parse",
+            follow=True,
+            process_request="enable_impersonate",
+        ),
+    ]
 
     def start_requests(self):
-        yield scrapy.Request(
-            "https://sg.iherb.com/pr/cococare-100-moroccan-argan-oil-2-fl-oz-60-ml/50488",
-            dont_filter=True,
-            meta={"impersonate": "chrome110"},
-        )
+        for url in self.start_urls:
+            yield scrapy.Request(
+                url,
+                dont_filter=True,
+                meta={"impersonate": self.get_impersonate_cffi()},
+            )
+
+    def enable_impersonate(self, request, response):
+        request.meta["impersonate"] = self.get_impersonate_cffi()
+        return request
 
     def parse(self, response: Response):
         title = response.css("h1#name ::text").get()
@@ -59,3 +74,6 @@ class SgIherbSpider(scrapy.Spider):
         )
 
         yield item
+
+    def get_impersonate_cffi(self):
+        return random.choice(self.browser_names)
