@@ -64,6 +64,7 @@ ROBOTSTXT_OBEY = False
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
     "sgiherb.pipelines.SgiherbPipeline": 300,
+    "sgiherb.pipelines.DbPipeline": 400,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

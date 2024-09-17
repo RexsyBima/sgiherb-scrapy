@@ -20,12 +20,11 @@ class SgIherbSpider(scrapy.Spider):
     }
 
     def start_requests(self):
-        for browser in ["chrome110", "edge99", "safari15_5"]:
-            yield scrapy.Request(
-                "https://sg.iherb.com/pr/cococare-100-moroccan-argan-oil-2-fl-oz-60-ml/50488",
-                dont_filter=True,
-                meta={"impersonate": browser},
-            )
+        yield scrapy.Request(
+            "https://sg.iherb.com/pr/cococare-100-moroccan-argan-oil-2-fl-oz-60-ml/50488",
+            dont_filter=True,
+            meta={"impersonate": "chrome110"},
+        )
 
     def parse(self, response: Response):
         title = response.css("h1#name ::text").get()
